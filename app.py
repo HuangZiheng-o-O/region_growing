@@ -34,14 +34,22 @@ def upload_image():
     return jsonify({'image_path': file_path})
 
 
+
+@app.route('/process', methods=['POST'])
 @app.route('/process', methods=['POST'])
 def process_image():
     data = request.get_json()
-    image_path = data['image_path']
-    seed_point = (data['x'], data['y'])  # 鼠标点击的位置
+    image_path = data['image_path']  # 此时是相对路径
+    seed_point = (data['x'], data['y'])
+
+    # 确保 image_path 是正确的本地路径
+    full_image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_path)
 
     # 读取图像并进行区域生长处理
-    original_image = cv2.imread(image_path)
+    original_image = cv2.imread(full_image_path)
+    if original_image is None:
+        return jsonify({'error': '无法读取图像文件，请检查路径。'})
+
     gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
     segmented_image = region_growing(gray_image, seed_point, threshold=10)
 

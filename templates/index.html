@@ -32,28 +32,37 @@
         };
 
         function getClickPosition(event) {
-            const rect = event.target.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
+    const rect = event.target.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
 
-            fetch('/process', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    image_path: event.target.src,
-                    x: x,
-                    y: y
-                })
-            }).then(response => response.json()).then(data => {
-                if (data.result_path) {
-                    const img = new Image();
-                    img.src = data.result_path;
-                    document.body.appendChild(img);
-                }
-            });
+    // 获取相对路径
+    // const imagePath = event.target.src.split('?')[0].replace('http://127.0.0.1:5001/', ''); // 获取相对路径
+    // const imageName = imagePath.split('/').pop(); // 获取文件名
+    // const formattedPath = `images/input_image/${imageName}`; // 更新为新的路径格式
+    const imagePath = event.target.src.split('?')[0]; // 获取相对路径
+    const imageName = imagePath.split('/').pop(); // 获取文件名
+
+    fetch('/process', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            image_path: imagePath,  // 保留相对路径
+            x: x,
+            y: y
+        })
+    }).then(response => response.json()).then(data => {
+        if (data.result_path) {
+            const img = new Image();
+            img.src = data.result_path;
+            document.body.appendChild(img);
         }
+    });
+}
+
+
     </script>
 </body>
 </html>

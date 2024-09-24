@@ -9,7 +9,7 @@ from metrics import calculate_metrics
 
 def main():
     # 输入图像路径
-    image_path = 'images/input_image.jpg/fruit.png'
+    image_path = 'images/input_image/fruit.png'
 
     # 读取原始图像和真实掩膜（用于计算指标）
     original_image = cv2.imread(image_path)
