@@ -36,22 +36,31 @@ def upload_image():
 
 
 @app.route('/process', methods=['POST'])
-@app.route('/process', methods=['POST'])
 def process_image():
     data = request.get_json()
     image_path = data['image_path']  # 此时是相对路径
-    seed_point = (data['x'], data['y'])
+    print("image_path", image_path)
+    x = int(data['x'])  # 确保转换为整数
+    y = int(data['y'])  # 确保转换为整数
 
-    # 确保 image_path 是正确的本地路径
-    full_image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_path)
+    seed_point = (x, y)
+    print("seed_point", seed_point)
 
-    # 读取图像并进行区域生长处理
-    original_image = cv2.imread(full_image_path)
+    original_image = cv2.imread(image_path)
+
     if original_image is None:
         return jsonify({'error': '无法读取图像文件，请检查路径。'})
 
+    if original_image is None:
+        print("original_image is 正常")
+
     gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
+    # 交互式选择种子点
+    # seed_point = select_seed_point(image_path)
+    # 打印seed_point
+
     segmented_image = region_growing(gray_image, seed_point, threshold=10)
+
 
     # 保存处理后的图像
     result_path = os.path.join(app.config['UPLOAD_FOLDER'], 'segmented.png')

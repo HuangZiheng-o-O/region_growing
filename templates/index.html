@@ -36,12 +36,12 @@
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
-    // 获取相对路径
-    // const imagePath = event.target.src.split('?')[0].replace('http://127.0.0.1:5001/', ''); // 获取相对路径
-    // const imageName = imagePath.split('/').pop(); // 获取文件名
-    // const formattedPath = `images/input_image/${imageName}`; // 更新为新的路径格式
-    const imagePath = event.target.src.split('?')[0]; // 获取相对路径
-    const imageName = imagePath.split('/').pop(); // 获取文件名
+
+    // 获取展示出来图片的 src 属性并去掉 host 部分，保留相对路径
+    const imagePath = event.target.src.replace(window.location.origin + "/", ""); // 保留相对路径
+            //在终端上打印
+    console.log('imagePath:', imagePath);
+
 
     fetch('/process', {
         method: 'POST',
