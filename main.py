@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from seed_selection import select_seed_point
 from region_growing import region_growing
-from visualization import display_results
+from visualization import display_results_origin
 from metrics import calculate_metrics
 
 def main():
@@ -32,7 +32,7 @@ def main():
     segmented_image = region_growing(gray_image, seed_point, threshold=10)
 
     # 显示结果
-    display_results(original_image, segmented_image)
+    display_results_origin(original_image, segmented_image)
 
     # 如果有真实掩膜，计算性能指标
     if true_mask is not None:

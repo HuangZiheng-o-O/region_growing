@@ -47,29 +47,28 @@ def process_image():
     print("seed_point", seed_point)
 
     original_image = cv2.imread(image_path)
+    print("1")
 
     if original_image is None:
         return jsonify({'error': '无法读取图像文件，请检查路径。'})
 
-    if original_image is None:
-        print("original_image is 正常")
-
     gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
-    # 交互式选择种子点
-    # seed_point = select_seed_point(image_path)
-    # 打印seed_point
-
+    print("2")
     # 执行区域生长算法
     segmented_image = region_growing(gray_image, seed_point, threshold=10)
-    # 显示结果
-    display_results(original_image, segmented_image)
 
+    print("wooo")
 
     # 保存处理后的图像
-    result_path = os.path.join(app.config['UPLOAD_FOLDER'], 'segmented.png')
-    cv2.imwrite(result_path, segmented_image)
+    result_overlay_path, result_segmented_path = display_results(original_image, segmented_image,
+                                                                 app.config['UPLOAD_FOLDER'])
+    print("result_overlay_path", result_overlay_path)
+    print("result_segmented_path", result_segmented_path)
+    return jsonify({
+        'result_overlay_path': result_overlay_path,
+        'result_segmented_path': result_segmented_path
+    })
 
-    return jsonify({'result_path': result_path})
 
 
 if __name__ == "__main__":

@@ -13,6 +13,8 @@
     <div>
         <img id="imageDisplay" style="display:none;" onclick="getClickPosition(event)">
     </div>
+    <div id="resultContainer"></div> <!-- 用于显示结果 -->
+
     <script>
         document.getElementById('uploadBtn').onclick = function() {
             const fileInput = document.getElementById('fileInput');
@@ -32,37 +34,40 @@
         };
 
         function getClickPosition(event) {
-    const rect = event.target.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+            const rect = event.target.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
 
+            const imagePath = event.target.src.replace(window.location.origin + "/", "");
+            console.log('imagePath:', imagePath);
 
-    // 获取展示出来图片的 src 属性并去掉 host 部分，保留相对路径
-    const imagePath = event.target.src.replace(window.location.origin + "/", ""); // 保留相对路径
-            //在终端上打印
-    console.log('imagePath:', imagePath);
+            fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    image_path: imagePath,
+                    x: x,
+                    y: y
+                })
+            }).then(response => response.json()).then(data => {
+                const resultContainer = document.getElementById('resultContainer');
+                resultContainer.innerHTML = ''; // 清空之前的结果
 
+                if (data.result_overlay_path) {
+                    const overlayImg = new Image();
+                    overlayImg.src = data.result_overlay_path;
+                    resultContainer.appendChild(overlayImg);
+                }
 
-    fetch('/process', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            image_path: imagePath,  // 保留相对路径
-            x: x,
-            y: y
-        })
-    }).then(response => response.json()).then(data => {
-        if (data.result_path) {
-            const img = new Image();
-            img.src = data.result_path;
-            document.body.appendChild(img);
+                if (data.result_segmented_path) {
+                    const segmentedImg = new Image();
+                    segmentedImg.src = data.result_segmented_path;
+                    resultContainer.appendChild(segmentedImg);
+                }
+            });
         }
-    });
-}
-
-
     </script>
 </body>
 </html>
