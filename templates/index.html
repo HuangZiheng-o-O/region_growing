@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>区域生长图像分割</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>区域生长图像分割</h1>
+    <input type="file" id="fileInput">
+    <button id="uploadBtn">上传图像</button>
+    <div>
+        <img id="imageDisplay" style="display:none;" onclick="getClickPosition(event)">
+    </div>
+    <script>
+        document.getElementById('uploadBtn').onclick = function() {
+            const fileInput = document.getElementById('fileInput');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json()).then(data => {
+                if (data.image_path) {
+                    const img = document.getElementById('imageDisplay');
+                    img.src = data.image_path;
+                    img.style.display = 'block';
+                }
+            });
+        };
+
+        function getClickPosition(event) {
+            const rect = event.target.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    image_path: event.target.src,
+                    x: x,
+                    y: y
+                })
+            }).then(response => response.json()).then(data => {
+                if (data.result_path) {
+                    const img = new Image();
+                    img.src = data.result_path;
+                    document.body.appendChild(img);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
