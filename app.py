@@ -59,7 +59,10 @@ def process_image():
     # seed_point = select_seed_point(image_path)
     # 打印seed_point
 
+    # 执行区域生长算法
     segmented_image = region_growing(gray_image, seed_point, threshold=10)
+    # 显示结果
+    display_results(original_image, segmented_image)
 
 
     # 保存处理后的图像
